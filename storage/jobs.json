@@ -1,0 +1,26 @@
+[
+  {
+    "id": "vid_1790718417018_h50fy",
+    "prompt": "A cinematic realistic aerial shot of a Yemeni coffee farm at sunrise, with detailed coffee trees, mountains in the background, soft golden sunlight, realistic camera movement, natural atmosphere, cinematic composition.",
+    "negativePrompt": "blurry, low quality, distorted, overexposed, static, jittery, watermark",
+    "model": "wan2.1-1.3b",
+    "resolution": "720p",
+    "aspectRatio": "16:9",
+    "duration": 5,
+    "fps": 24,
+    "seed": 354101,
+    "cameraMotion": "drone-cinematic",
+    "status": "completed",
+    "progress": 100,
+    "stepDescription": "Generation Complete",
+    "createdAt": 1790718417018,
+    "workerType": "local-engine",
+    "startedAt": 1790718417018,
+    "completedAt": 1790718428947,
+    "generationTimeSec": 11.9,
+    "videoUrl": "/storage/videos/vid_1790718417018_h50fy.mp4",
+    "thumbnailUrl": "/storage/videos/vid_1790718417018_h50fy_thumb.jpg",
+    "fileSizeBytes": 3415510,
+    "vramPeakGB": 8.19
+  }
+]

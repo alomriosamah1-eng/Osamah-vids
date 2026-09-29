@@ -1,0 +1,6 @@
+{
+  "name": "Osamah Vids - AI Video Generation Platform",
+  "description": "Professional AI Video Generation Platform powered by SOTA open-source models (Wan2.1 / LTX-Video) with real-time job queue, prompt engineering, and multi-resolution rendering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
