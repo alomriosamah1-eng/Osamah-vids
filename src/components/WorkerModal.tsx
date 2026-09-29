@@ -89,11 +89,23 @@ export const WorkerModal: React.FC<WorkerModalProps> = ({
         </div>
 
         {/* Steps to run on Google Colab */}
-        <div className="space-y-2.5 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-          <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-            <Terminal className="h-3.5 w-3.5" />
-            <span>{lang === 'ar' ? 'خطوات تشغيل كولاب المجاني (Free T4 GPU):' : 'Colab Free T4 GPU Launch Steps:'}</span>
-          </span>
+        <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <Terminal className="h-3.5 w-3.5" />
+              <span>{lang === 'ar' ? 'تشغيل كولاب المجاني (Google Colab T4/A100 GPU):' : 'Run on Google Colab (Free T4/A100 GPU):'}</span>
+            </span>
+            <a
+              href="https://colab.research.google.com/github/alomriosamah1-eng/Osamah-vids/blob/main/colab/osamah_vids_wan21_worker.ipynb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#F9AB00]/15 hover:bg-[#F9AB00]/25 px-2.5 py-1 text-xs font-bold text-[#F9AB00] border border-[#F9AB00]/30 transition shadow-sm"
+            >
+              <span>{lang === 'ar' ? 'فتح في Google Colab بنقرة واحدة' : 'Open in Google Colab'}</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+
           <div className="space-y-1.5 text-xs text-slate-300">
             <p>{t.step1Colab}</p>
             <p>{t.step2Colab}</p>
