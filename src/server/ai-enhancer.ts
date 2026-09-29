@@ -6,7 +6,14 @@ function getAI(): GoogleGenAI | null {
   if (aiInstance) return aiInstance;
   const apiKey = process.env.GEMINI_API_KEY;
   if (apiKey) {
-    aiInstance = new GoogleGenAI({ apiKey });
+    aiInstance = new GoogleGenAI({ 
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
     return aiInstance;
   }
   return null;
@@ -31,7 +38,6 @@ export async function enhanceVideoPrompt(
   const ai = getAI();
 
   if (!ai) {
-    // High-quality fallback rule-based enhancer when API key is not present
     return generateFallbackEnhancement(prompt, style, cameraDirective);
   }
 
@@ -44,7 +50,6 @@ Include precise descriptions of:
 - Lighting & Atmosphere (e.g., golden hour sunlight, volumetric god rays, mist, anamorphic lens flares)
 - Motion dynamics (e.g., gentle breeze moving foliage, realistic water ripples, steady cinematic speed)
 
-Also generate a tailored negative prompt and select the best camera motion and lighting style.
 Output strictly valid JSON with this schema:
 {
   "enhancedPrompt": "detailed English prompt...",
@@ -56,7 +61,7 @@ Output strictly valid JSON with this schema:
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: `User Prompt: "${prompt}"\nPreferred Style: ${style}\nCamera Movement Hint: ${cameraDirective || 'auto'}`,
       config: {
         systemInstruction: systemPrompt,

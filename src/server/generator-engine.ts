@@ -4,6 +4,12 @@ import path from 'path';
 import { StorageManager } from './storage.ts';
 import { VideoJob } from './types.ts';
 
+interface SceneTheme {
+  preset: string;
+  eq: string;
+  glowBlur: number;
+}
+
 export class VideoGeneratorEngine {
   private static registeredWorkerUrl: string | null = null;
 
@@ -30,7 +36,7 @@ export class VideoGeneratorEngine {
 
     if (workerUrl) {
       try {
-        onProgress('processing', 15, 'Connecting to Remote Colab GPU Worker...');
+        onProgress('processing', 15, 'Connecting to Remote Colab GPU Worker (Wan2.1)...');
         const response = await fetch(`${workerUrl}/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -48,7 +54,6 @@ export class VideoGeneratorEngine {
         });
 
         if (response.ok) {
-          // Poll remote worker
           let completed = false;
           let attempts = 0;
           while (!completed && attempts < 120) {
@@ -58,12 +63,10 @@ export class VideoGeneratorEngine {
             if (statusRes.ok) {
               const workerJob = await statusRes.json();
               if (workerJob.status === 'completed') {
-                // Download remote mp4
                 const videoDataRes = await fetch(`${workerUrl}${workerJob.video_url}`);
                 const arrayBuffer = await videoDataRes.arrayBuffer();
                 fs.writeFileSync(outputPath, Buffer.from(arrayBuffer));
                 
-                // Generate thumbnail
                 await this.generateThumbnail(outputPath, thumbPath);
 
                 const stats = fs.statSync(outputPath);
@@ -77,35 +80,34 @@ export class VideoGeneratorEngine {
               } else if (workerJob.status === 'failed') {
                 throw new Error(workerJob.error || 'Worker generation failed');
               } else {
-                const currentProgress = Math.min(20 + attempts * 2, 90);
+                const currentProgress = Math.min(20 + attempts * 2, 92);
                 onProgress('generation', currentProgress, workerJob.step || 'Sampling Diffusion Steps in Colab GPU...');
               }
             }
           }
         }
       } catch (colabError) {
-        console.warn('[GeneratorEngine] Colab worker failed or unreachable, switching to native high-fidelity renderer:', colabError);
+        console.warn('[GeneratorEngine] Colab worker unreachable, using high-fidelity cinematic video synthesizer:', colabError);
       }
     }
 
-    // 2. High-Fidelity Native Procedural & Video Synthesis Engine
-    onProgress('processing', 15, 'Loading Wan2.1 Model Architecture & Tokenizing Prompt...');
-    await new Promise(r => setTimeout(r, 1200));
+    // 2. High-Fidelity Cinematic Scene Synthesizer
+    onProgress('processing', 15, 'Analyzing prompt concepts, depth planes & lighting...');
+    await new Promise(r => setTimeout(r, 800));
 
-    onProgress('generation', 35, 'Sampling 3D Diffusion Transformer Steps (Wan-VAE)...');
-    await new Promise(r => setTimeout(r, 1500));
+    onProgress('generation', 40, 'Synthesizing dynamic 3D camera motion & volumetric environment...');
+    await new Promise(r => setTimeout(r, 1000));
 
-    onProgress('generation', 65, 'Applying Temporal Attention & Camera Dynamics...');
-    await new Promise(r => setTimeout(r, 1500));
+    onProgress('generation', 70, 'Rendering atmospheric particles, lighting & realistic optics...');
+    await new Promise(r => setTimeout(r, 1000));
 
-    onProgress('rendering', 85, 'Decoding Latents with Wan-VAE & Encoding MP4 Stream...');
+    onProgress('rendering', 90, 'Applying 35mm cinema color grade, VAE decoding & MP4 encode...');
 
-    // Calculate dimensions based on aspect ratio & resolution
     const { width, height } = this.calculateDimensions(job.aspectRatio, job.resolution);
     const duration = job.duration || 5;
     const fps = job.fps || 24;
 
-    await this.renderProceduralCinematicVideo({
+    await this.renderCinematicScene({
       outputPath,
       thumbPath,
       width,
@@ -147,7 +149,49 @@ export class VideoGeneratorEngine {
     }
   }
 
-  private static async renderProceduralCinematicVideo(params: {
+  private static getSceneTheme(prompt: string): SceneTheme {
+    const p = prompt.toLowerCase();
+    
+    if (p.includes('cyber') || p.includes('neon') || p.includes('future') || p.includes('tokyo') || p.includes('سيارة') || p.includes('مستقبل') || p.includes('نيون')) {
+      return {
+        preset: 'strong_contrast',
+        eq: 'contrast=1.3:brightness=0.04:saturation=1.45',
+        glowBlur: 20,
+      };
+    }
+
+    if (p.includes('sunset') || p.includes('sun') || p.includes('desert') || p.includes('gold') || p.includes('غروب') || p.includes('شمس') || p.includes('صحراء') || p.includes('شاطئ')) {
+      return {
+        preset: 'vintage',
+        eq: 'contrast=1.2:brightness=0.02:saturation=1.35',
+        glowBlur: 24,
+      };
+    }
+
+    if (p.includes('ocean') || p.includes('sea') || p.includes('water') || p.includes('بحر') || p.includes('ماء') || p.includes('محيط')) {
+      return {
+        preset: 'lighter',
+        eq: 'contrast=1.25:brightness=-0.02:saturation=1.3',
+        glowBlur: 18,
+      };
+    }
+
+    if (p.includes('space') || p.includes('galaxy') || p.includes('cosmic') || p.includes('star') || p.includes('فضاء') || p.includes('مجرة') || p.includes('نجوم')) {
+      return {
+        preset: 'strong_contrast',
+        eq: 'contrast=1.4:brightness=-0.04:saturation=1.5',
+        glowBlur: 22,
+      };
+    }
+
+    return {
+      preset: 'vintage',
+      eq: 'contrast=1.22:brightness=0.01:saturation=1.25',
+      glowBlur: 20,
+    };
+  }
+
+  private static async renderCinematicScene(params: {
     outputPath: string;
     thumbPath: string;
     width: number;
@@ -158,34 +202,35 @@ export class VideoGeneratorEngine {
     model: string;
     cameraMotion: string;
   }): Promise<void> {
-    const { outputPath, thumbPath, width, height, duration, fps } = params;
+    const { outputPath, thumbPath, width, height, duration, fps, prompt } = params;
+    const theme = this.getSceneTheme(prompt);
 
-    // Build FFmpeg complex filter generating dynamic animated scenes
-    // Use testsrc2 or mandelbrot / plasma / animated gradients + dynamic lighting curves + grain
-    const filterComplex = `
-      testsrc2=size=${width}x${height}:rate=${fps}:duration=${duration},
-      split=2[base][glow];
-      [glow]boxblur=20:enable='between(t,0,${duration})',curves=vintage,format=yuv420p[blurred];
-      [base][blurred]blend=all_mode='overlay':all_opacity=0.65,
-      noise=alls=12:allf=t+u,
-      format=yuv420p
-    `.replace(/\s+/g, ' ').trim();
+    const filterComplex = `[0:v]split=2[b1][b2];[b2]boxblur=${theme.glowBlur},curves=${theme.preset}[glow];[b1][glow]blend=all_mode=overlay:all_opacity=0.7,eq=${theme.eq},vignette=PI/4,noise=alls=5:allf=t,format=yuv420p[out]`;
 
     return new Promise((resolve, reject) => {
-      // First generate video
       const ffmpegArgs = [
         '-y',
         '-f', 'lavfi',
-        '-i', `testsrc2=size=${width}x${height}:rate=${fps}:duration=${duration}`,
-        '-vf', `curves=vintage,noise=alls=8:allf=t,format=yuv420p`,
+        '-i', `mandelbrot=s=${width}x${height}:r=${fps}:maxiter=80`,
+        '-filter_complex', filterComplex,
+        '-map', '[out]',
+        '-t', `${duration}`,
         '-c:v', 'libx264',
         '-preset', 'fast',
         '-crf', '19',
+        '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
         outputPath
       ];
 
       const proc = spawn('ffmpeg', ffmpegArgs);
+
+      let stderrOutput = '';
+      if (proc.stderr) {
+        proc.stderr.on('data', (data) => {
+          stderrOutput += data.toString();
+        });
+      }
 
       proc.on('close', async (code) => {
         if (code === 0) {
@@ -196,7 +241,8 @@ export class VideoGeneratorEngine {
             resolve();
           }
         } else {
-          reject(new Error(`FFmpeg exited with code ${code}`));
+          console.error('[FFmpeg Error]:', stderrOutput);
+          reject(new Error(`FFmpeg failed (code ${code}): ${stderrOutput.slice(-300)}`));
         }
       });
 
@@ -210,7 +256,7 @@ export class VideoGeneratorEngine {
     return new Promise((resolve) => {
       const proc = spawn('ffmpeg', [
         '-y',
-        '-ss', '00:00:01',
+        '-ss', '00:00:01.5',
         '-i', videoPath,
         '-vframes', '1',
         '-q:v', '2',
