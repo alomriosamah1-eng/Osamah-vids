@@ -69,12 +69,22 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('ended', handleEnded);
 
+    // Safe initial play
+    const promise = video.play();
+    if (promise !== undefined) {
+      promise
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          setIsPlaying(false);
+        });
+    }
+
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('ended', handleEnded);
     };
-  }, [isLooping]);
+  }, [job.videoUrl, isLooping]);
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -83,8 +93,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       video.pause();
       setIsPlaying(false);
     } else {
-      video.play();
-      setIsPlaying(true);
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            if (err.name !== 'AbortError') {
+              console.warn('Playback error:', err);
+            }
+          });
+      }
     }
   };
 

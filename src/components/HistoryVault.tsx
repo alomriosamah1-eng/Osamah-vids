@@ -166,8 +166,15 @@ export const HistoryVault: React.FC<HistoryVaultProps> = ({
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     muted
                     loop
-                    onMouseEnter={(e) => (e.target as HTMLVideoElement).play()}
-                    onMouseLeave={(e) => (e.target as HTMLVideoElement).pause()}
+                    onMouseEnter={(e) => {
+                      const v = e.target as HTMLVideoElement;
+                      const p = v.play();
+                      if (p !== undefined) p.catch(() => {});
+                    }}
+                    onMouseLeave={(e) => {
+                      const v = e.target as HTMLVideoElement;
+                      v.pause();
+                    }}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-slate-950">
