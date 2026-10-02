@@ -86,12 +86,41 @@ export class ApiService {
     return res.ok;
   }
 
-  public static async connectWorker(workerUrl: string | null): Promise<{ success: boolean; message: string }> {
+  /**
+   * Registers (or clears) the GPU worker URL. The server verifies the worker is
+   * reachable AND running on a real GPU before accepting it, so a rejection here
+   * means the worker is genuinely unusable. Throws with the server's diagnostic.
+   */
+  public static async connectWorker(workerUrl: string | null): Promise<{
+    success: boolean;
+    message: string;
+    gpu?: { device: string; gpuName: string; vramTotalGb: number; loadedModel: string | null };
+  }> {
     const res = await fetch(`${API_BASE_URL}/api/v1/worker/connect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ workerUrl }),
     });
-    return res.json();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.success === false) {
+      throw new Error(data.error || `Worker connection failed (HTTP ${res.status})`);
+    }
+    return data;
+  }
+
+  public static async getWorkerStatus(): Promise<{
+    connected: boolean;
+    ready: boolean;
+    workerUrl?: string;
+    device?: string;
+    gpuName?: string;
+    error?: string;
+  }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/worker/status`);
+      return await res.json();
+    } catch {
+      return { connected: false, ready: false, error: 'Could not reach the server.' };
+    }
   }
 }

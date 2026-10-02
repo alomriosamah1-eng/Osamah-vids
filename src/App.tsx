@@ -183,10 +183,45 @@ export default function App() {
       setWorkerUrl(url || '');
       setIsWorkerConnected(!!url);
       addToast('success', url ? t.workerConnected : t.workerDisconnected);
-    } catch (e) {
-      addToast('error', 'Failed to update worker URL');
+    } catch (e: any) {
+      // Show the server's real diagnostic instead of a generic failure.
+      setWorkerUrl('');
+      setIsWorkerConnected(false);
+      addToast('error', e?.message || 'Failed to update worker URL');
+      throw e;
     }
   };
+
+  // Poll the worker's real liveness. A stored URL alone is never treated as
+  // "connected" -- if the Colab runtime died, the UI says so.
+  useEffect(() => {
+    let cancelled = false;
+
+    const probe = async () => {
+      try {
+        const status = await ApiService.getWorkerStatus();
+        if (cancelled) return;
+        if (status.ready) {
+          setWorkerUrl(status.workerUrl || '');
+          setIsWorkerConnected(true);
+        } else {
+          setIsWorkerConnected(false);
+          if (status.workerUrl) setWorkerUrl('');
+        }
+      } catch {
+        if (cancelled) return;
+        setIsWorkerConnected(false);
+        setWorkerUrl('');
+      }
+    };
+
+    probe();
+    const timer = setInterval(probe, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#090b10] text-[#f1f5f9] flex flex-col selection:bg-amber-500/30 selection:text-amber-200">

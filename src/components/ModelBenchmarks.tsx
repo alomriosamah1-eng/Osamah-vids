@@ -27,7 +27,7 @@ export const ModelBenchmarks: React.FC<ModelBenchmarksProps> = ({ lang }) => {
       repo: 'Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
       hfUrl: 'https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers',
       license: 'Apache 2.0',
-      vram: '8.19 GB (Low VRAM Offload)',
+      vram: '~6-8 GB (Low VRAM Offload)',
       colabT4: 'YES (Full Native Support)',
       resolution: '480p / 720p',
       fps: '16 / 24 FPS',

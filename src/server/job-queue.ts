@@ -9,6 +9,13 @@ export class JobQueueManager {
 
   public static async createJob(payload: GenerateVideoPayload): Promise<VideoJob> {
     const id = `vid_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+    // Pin the worker URL onto the job so a queued video can never be silently
+    // sent to a different (or missing) backend than the one the user chose.
+    const workerUrl = payload.customWorkerUrl?.trim()
+      || VideoGeneratorEngine.getWorkerUrl()
+      || undefined;
+
     const job: VideoJob = {
       id,
       prompt: payload.prompt,
@@ -22,16 +29,15 @@ export class JobQueueManager {
       seed: payload.seed ?? Math.floor(Math.random() * 1000000),
       cameraMotion: payload.cameraMotion || 'drone-cinematic',
       imageUrl: payload.imageUrl,
+      numInferenceSteps: payload.numInferenceSteps ?? 30,
+      guidanceScale: payload.guidanceScale ?? 6.0,
       status: 'queued',
       progress: 0,
       stepDescription: 'Queued in processing pipeline',
       createdAt: Date.now(),
-      workerType: payload.customWorkerUrl ? 'colab-remote' : 'local-engine',
+      workerType: 'colab-gpu',
+      workerUrl,
     };
-
-    if (payload.customWorkerUrl) {
-      VideoGeneratorEngine.setWorkerUrl(payload.customWorkerUrl);
-    }
 
     StorageManager.saveJob(job);
     this.queue.push(id);
@@ -70,8 +76,10 @@ export class JobQueueManager {
       try {
         job.status = 'processing';
         job.startedAt = Date.now();
-        job.progress = 10;
-        job.stepDescription = 'Initializing Diffusion Pipeline...';
+        job.progress = 5;
+        job.stepDescription = job.workerUrl
+          ? 'Dispatching job to GPU worker...'
+          : 'Waiting for a GPU worker to be configured...';
         StorageManager.saveJob(job);
         this.notify(job);
 
@@ -95,6 +103,9 @@ export class JobQueueManager {
         job.thumbnailUrl = result.thumbnailUrl;
         job.fileSizeBytes = result.fileSizeBytes;
         job.vramPeakGB = result.vramPeakGB;
+        job.gpuName = result.gpuName;
+        job.frameCount = result.frameCount;
+        job.playbackFps = result.playbackFps;
         job.stepDescription = 'Generation Complete';
 
         StorageManager.saveJob(job);

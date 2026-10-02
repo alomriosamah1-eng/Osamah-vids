@@ -291,26 +291,38 @@ export const PromptStudio: React.FC<PromptStudioProps> = ({
         <div className="space-y-2.5">
           <label className="block text-xs font-bold text-slate-200">{t.modelLabel}</label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-            {models.map(model => (
+            {models.map(model => {
+              const unavailable = model.availableOnWorker === false;
+              return (
               <button
                 key={model.id}
                 type="button"
-                onClick={() => setSelectedModel(model.id)}
+                disabled={unavailable}
+                onClick={() => !unavailable && setSelectedModel(model.id)}
+                title={unavailable
+                  ? (lang === 'ar'
+                      ? 'هذا النموذج غير مربوط بعامل GPU ولا يمكن توليده حالياً'
+                      : 'This model is not wired into the GPU worker and cannot generate yet')
+                  : undefined}
                 className={`flex flex-col justify-between rounded-xl border p-3 text-left transition-all relative ${
-                  selectedModel === model.id
-                    ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/40'
-                    : 'border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-900/60'
+                  unavailable
+                    ? 'border-slate-800/60 bg-slate-950/20 opacity-45 cursor-not-allowed'
+                    : selectedModel === model.id
+                      ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/40'
+                      : 'border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-900/60'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-bold text-slate-100">{model.name}</span>
                     <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold ${
-                      model.id === 'wan2.1-1.3b' 
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
-                        : 'bg-slate-800 text-slate-400'
+                      unavailable
+                        ? 'bg-slate-800/60 text-slate-500 border border-slate-700/60'
+                        : model.id === 'wan2.1-1.3b'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          : 'bg-slate-800 text-slate-400'
                     }`}>
-                      {model.badge}
+                      {unavailable ? (lang === 'ar' ? 'غير متاح' : 'Unavailable') : model.badge}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
@@ -327,7 +339,8 @@ export const PromptStudio: React.FC<PromptStudioProps> = ({
                   </div>
                 )}
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 

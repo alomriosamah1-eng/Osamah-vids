@@ -114,7 +114,7 @@ export const DocumentationModal: React.FC<DocumentationModalProps> = ({
                 تم اختيار نموذج **Wan2.1** المطور من قبل فريق Wan-AI (Alibaba) بعد دراسة دقيقة ومقارنة شاملة مع LTX-Video و HunyuanVideo و CogVideoX للأسباب التالية:
               </p>
               <ul className="list-disc list-inside space-y-1.5 text-slate-300">
-                <li><strong className="text-white">أداء فائق باستهلاك ذاكرة منخفض:</strong> النسخة 1.3B تعمل على Google Colab المجاني (T4 GPU) وتستهلك 8.19 GB VRAM فقط مع تقنية CPU Offloading.</li>
+                <li><strong className="text-white">أداء فائق باستهلاك ذاكرة منخفض:</strong> النسخة 1.3B تعمل على Google Colab المجاني (T4 GPU) وتستهلك نحو 6–8 GB VRAM مع تقنية CPU Offloading. الرقم المعروض في التطبيق مقيس فعلياً من العامل، وهو يختلف حسب الإعدادات.</li>
                 <li><strong className="text-white">ترخيص مفتوح Apache 2.0:</strong> يتيح الاستخدام التجاري والبحثي دون قيود تعسفية.</li>
                 <li><strong className="text-white">دعم Hugging Face Diffusers الرسمي:</strong> متاح مباشرة عبر كلاس `WanPipeline` و `AutoencoderKLWan`.</li>
                 <li><strong className="text-white">دعم Text-to-Video و Image-to-Video:</strong> إمكانية تحريك الصور الثابتة بنعومة سينمائية فائقة.</li>

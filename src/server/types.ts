@@ -32,11 +32,21 @@ export interface VideoJob {
   startedAt?: number;
   completedAt?: number;
   generationTimeSec?: number;
+  /** Real peak VRAM in GB, reported by the GPU worker. Absent when the worker did not measure it. Never estimated. */
   vramPeakGB?: number;
+  /** Name of the GPU the worker actually ran on, e.g. "Tesla T4". */
+  gpuName?: string;
+  /** Number of frames the diffusion model actually produced. */
+  frameCount?: number;
+  /** Playback fps of the produced file, which differs from the requested fps for Wan2.1. */
+  playbackFps?: number;
+  numInferenceSteps?: number;
+  guidanceScale?: number;
   videoUrl?: string;
   thumbnailUrl?: string;
   fileSizeBytes?: number;
-  workerType?: 'colab-remote' | 'huggingface-diffusers' | 'local-engine';
+  workerType: 'colab-gpu';
+  workerUrl?: string;
 }
 
 export interface GenerateVideoPayload {
@@ -51,6 +61,9 @@ export interface GenerateVideoPayload {
   seed?: number;
   cameraMotion?: CameraMotion;
   imageUrl?: string;
+  numInferenceSteps?: number;
+  guidanceScale?: number;
+  /** Tunnel URL of the GPU worker that must execute this job. */
   customWorkerUrl?: string;
 }
 
@@ -67,4 +80,6 @@ export interface ModelInfo {
   supportsI2V: boolean;
   speedRating: 'Ultra Fast' | 'Fast' | 'Cinema High-End';
   isDefault?: boolean;
+  /** False when colab/worker.py cannot execute this model, so the UI can disable it. */
+  availableOnWorker: boolean;
 }

@@ -1,9 +1,14 @@
-{
- "cells": [
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+import json, pathlib
+
+def md(*lines):
+    return {"cell_type": "markdown", "metadata": {}, "source": list(lines)}
+
+def code(*lines):
+    return {"cell_type": "code", "execution_count": None, "metadata": {}, "outputs": [], "source": list(lines)}
+
+cells = []
+
+cells.append(md(
     "# 🎬 Osamah Vids — Google Colab GPU Worker\n",
     "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alomriosamah1-eng/Osamah-vids/blob/main/colab/osamah_vids_wan21_worker.ipynb)\n",
     "\n",
@@ -15,24 +20,16 @@
     "3. Copy the tunnel URL from step 4 into the app under **Connect GPU Worker**.\n",
     "\n",
     "### Reality check on timing\n",
-    "Wan2.1 1.3B on a free T4 takes roughly **4–9 minutes** for a 5-second 480p clip (81 frames, 30 steps), and the first run downloads ~8 GB of weights. This is real diffusion sampling, not a fast filter."
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "Wan2.1 1.3B on a free T4 takes roughly **4–9 minutes** for a 5-second 480p clip (81 frames, 30 steps), and the first run downloads ~8 GB of weights. This is real diffusion sampling, not a fast filter.",
+))
+
+cells.append(md(
     "### ⚡ Step 1 — Verify the GPU runtime\n",
     "\n",
-    "If this prints `NO GPU`, choose **Runtime → Change runtime type → GPU**, then **Runtime → Restart session** and re-run."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "If this prints `NO GPU`, choose **Runtime → Change runtime type → GPU**, then **Runtime → Restart session** and re-run.",
+))
+
+cells.append(code(
     "import subprocess\n",
     "\n",
     "out = subprocess.run([\"nvidia-smi\"], capture_output=True, text=True)\n",
@@ -41,24 +38,16 @@
     "else:\n",
     "    print(\"NO GPU DETECTED.\")\n",
     "    print(\"Runtime -> Change runtime type -> GPU (T4), then Runtime -> Restart session.\")\n",
-    "    print(out.stderr)\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "    print(out.stderr)\n",
+))
+
+cells.append(md(
     "### 📦 Step 2 — Install the real inference stack\n",
     "\n",
-    "Pinned from `colab/requirements.txt`. This is the same dependency set the web app documents, so a working local GPU box and this notebook behave identically."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "Pinned from `colab/requirements.txt`. This is the same dependency set the web app documents, so a working local GPU box and this notebook behave identically.",
+))
+
+cells.append(code(
     "!git clone --depth 1 https://github.com/alomriosamah1-eng/Osamah-vids.git /content/osamah-vids 2>/dev/null || (cd /content/osamah-vids && git pull)\n",
     "!pip install -q -r /content/osamah-vids/colab/requirements.txt\n",
     "!pip install -q pyngrok\n",
@@ -73,24 +62,16 @@
     "    bf16 = torch.cuda.is_bf16_supported()\n",
     "    print(\"bf16 ok   :\", bf16, \"-> worker dtype:\", \"bfloat16\" if bf16 else \"float16 (T4 safe)\")\n",
     "else:\n",
-    "    print(\"No GPU. The worker will refuse connections until you switch runtime.\")\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "    print(\"No GPU. The worker will refuse connections until you switch runtime.\")\n",
+))
+
+cells.append(md(
     "### 🚀 Step 3 — Start the GPU worker\n",
     "\n",
-    "Starts `colab/worker.py` on port 8000 and blocks until `/health` confirms it is running on a **real GPU**."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "Starts `colab/worker.py` on port 8000 and blocks until `/health` confirms it is running on a **real GPU**.",
+))
+
+cells.append(code(
     "import os, sys, time, subprocess, json, urllib.request\n",
     "\n",
     "WORKER_DIR = \"/content/osamah-vids/colab\"\n",
@@ -120,28 +101,20 @@
     "if health[\"device\"] != \"cuda\":\n",
     "    raise SystemExit(\"Worker is on CPU. Switch the runtime to a GPU and re-run this cell.\")\n",
     "print()\n",
-    "print(\"OK: worker live on\", health[\"gpu_name\"], \"with\", health[\"vram_total_gb\"], \"GB VRAM\")\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "print(\"OK: worker live on\", health[\"gpu_name\"], \"with\", health[\"vram_total_gb\"], \"GB VRAM\")\n",
+))
+
+cells.append(md(
     "### 🌐 Step 4 — Expose the worker and copy its URL\n",
     "\n",
     "The web app runs on your own machine, so the worker needs a public URL.\n",
     "\n",
     "**Option A — ngrok (recommended).** Paste a free authtoken from https://dashboard.ngrok.com into `NGROK_TOKEN` below.\n",
     "\n",
-    "**Option B — localtunnel.** No account needed, but rate-limited and sometimes throttled by Colab's shared egress IP."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "**Option B — localtunnel.** No account needed, but rate-limited and sometimes throttled by Colab's shared egress IP.",
+))
+
+cells.append(code(
     "NGROK_TOKEN = \"\"  # paste your ngrok authtoken here, or leave blank for localtunnel\n",
     "\n",
     "TUNNEL_URL = None\n",
@@ -168,26 +141,18 @@
     "    print(\"The app verifies the URL is alive AND on a GPU before accepting it.\")\n",
     "else:\n",
     "    print(\"Could not open a tunnel. Re-run this cell, or use ngrok with a token.\")\n",
-    "print(\"=\" * 66)\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+    "print(\"=\" * 66)\n",
+))
+
+cells.append(md(
     "### 🧪 Step 5 (optional) — Generate a clip from inside Colab\n",
     "\n",
     "Confirms the model works before wiring up the web app. Expect several minutes.\n",
     "\n",
-    "> **Why you get ~5 s at 16 fps and not 24 fps:** Wan2.1 is trained on **81 frames at 16 fps**. Asking for 120 frames at 24 fps exceeds its temporal length, so the worker clamps the denoised frame count and derives the playback fps from it. Asking for more frames than the model supports does not give you a longer clip, it gives you a broken one."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "> **Why you get ~5 s at 16 fps and not 24 fps:** Wan2.1 is trained on **81 frames at 16 fps**. Asking for 120 frames at 24 fps exceeds its temporal length, so the worker clamps the denoised frame count and derives the playback fps from it. Asking for more frames than the model supports does not give you a longer clip, it gives you a broken one.",
+))
+
+cells.append(code(
     "jid = \"colab_selftest\"\n",
     "req = {\n",
     "    \"job_id\": jid,\n",
@@ -218,24 +183,36 @@
     "print(json.dumps(st, indent=2))\n",
     "if st[\"status\"] == \"completed\":\n",
     "    print()\n",
-    "    print(\"Play it:\", os.path.join(WORKER_DIR, \"outputs\", jid + \".mp4\"))\n"
-   ]
-  }
- ],
- "metadata": {
-  "accelerator": "GPU",
-  "colab": {
-   "gpuType": "T4",
-   "provenance": []
-  },
-  "kernelspec": {
-   "display_name": "Python 3",
-   "name": "python3"
-  },
-  "language_info": {
-   "name": "python"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 0
+    "    print(\"Play it:\", os.path.join(WORKER_DIR, \"outputs\", jid + \".mp4\"))\n",
+))
+
+nb = {
+    "cells": cells,
+    "metadata": {
+        "accelerator": "GPU",
+        "colab": {"gpuType": "T4", "provenance": []},
+        "kernelspec": {"display_name": "Python 3", "name": "python3"},
+        "language_info": {"name": "python"},
+    },
+    "nbformat": 4,
+    "nbformat_minor": 0,
 }
+
+out = pathlib.Path("/home/osamah/program/osamah_vids/colab/osamah_vids_wan21_worker.ipynb")
+out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
+
+# verify
+nb2 = json.loads(out.read_text())
+print("valid JSON, cells:", len(nb2["cells"]))
+bad = 0
+for i, c in enumerate(nb2["cells"]):
+    if c["cell_type"] != "code":
+        continue
+    src = "".join(c["source"])
+    py = "\n".join(l for l in src.split("\n") if not l.lstrip().startswith(("!", "%")))
+    try:
+        compile(py, f"cell{i}", "exec")
+    except SyntaxError as e:
+        bad += 1
+        print(f"  SYNTAX ERROR cell {i}: {e}")
+print("all code cells compile" if not bad else f"{bad} real errors")

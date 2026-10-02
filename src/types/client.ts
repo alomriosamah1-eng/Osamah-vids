@@ -35,6 +35,9 @@ export interface VideoJob {
   completedAt?: number;
   generationTimeSec?: number;
   vramPeakGB?: number;
+  gpuName?: string;
+  frameCount?: number;
+  playbackFps?: number;
   videoUrl?: string;
   thumbnailUrl?: string;
   fileSizeBytes?: number;
@@ -52,6 +55,7 @@ export interface ModelInfo {
   vramRequired: string;
   recommendedResolution: string;
   supportsI2V: boolean;
+  availableOnWorker: boolean;
   speedRating: 'Ultra Fast' | 'Fast' | 'Cinema High-End';
   isDefault?: boolean;
 }

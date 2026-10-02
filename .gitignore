@@ -7,9 +7,21 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local Colab tunnel URL written by scripts/start.sh -- machine-specific and
+# changes every time the runtime restarts.
+storage/worker-url.txt
+storage/server.log
+storage/server.pid
 __pycache__/
 *.pyc
 *.safetensors
 *.ckpt
 *.pth
 *.bin
+
+# GPU worker runtime artifacts
+colab/outputs/
+colab/outputs_cpu/
+colab/test/outputs/
+colab/test/outputs_cpu/

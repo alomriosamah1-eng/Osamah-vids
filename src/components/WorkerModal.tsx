@@ -34,17 +34,19 @@ export const WorkerModal: React.FC<WorkerModalProps> = ({
   const [urlInput, setUrlInput] = useState(workerUrl || '');
   const [isSaving, setIsSaving] = useState(false);
   const [copiedColab, setCopiedColab] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setError(null);
     try {
       await onSaveWorkerUrl(urlInput.trim() || null);
       onClose();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to connect the worker');
     } finally {
       setIsSaving(false);
     }
@@ -52,18 +54,26 @@ export const WorkerModal: React.FC<WorkerModalProps> = ({
 
   const handleDisconnect = async () => {
     setIsSaving(true);
+    setError(null);
     try {
       setUrlInput('');
       await onSaveWorkerUrl(null);
       onClose();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to disconnect the worker');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const colabCommand = `!pip install -q diffusers transformers accelerate torch fastapi uvicorn\n!git clone https://github.com/alomriosamah1-eng/Osamah-vids.git app_repo\n%cd app_repo/colab\n!python3 worker.py`;
+  const colabCommand = `!pip install -q -r https://raw.githubusercontent.com/alomriosamah1-eng/Osamah-vids/main/colab/requirements.txt
+!git clone --depth 1 https://github.com/alomriosamah1-eng/Osamah-vids.git /content/osamah-vids
+!python /content/osamah-vids/colab/worker.py
+
+# then in a second cell, expose the tunnel and copy the URL:
+!pip install -q pyngrok
+!ngrok config set-authtoken <YOUR_NGROK_TOKEN>
+!ngrok http 8000`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in duration-200">
@@ -143,7 +153,14 @@ export const WorkerModal: React.FC<WorkerModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-2">
+            {error && (
+              <div className="flex items-start gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
+                <p className="text-xs leading-relaxed text-rose-200">{error}</p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2">
             {isConnected ? (
               <button
                 type="button"

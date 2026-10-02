@@ -351,12 +351,20 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-2.5 space-y-0.5">
             <span className="text-[10px] text-slate-400">{t.vramUsed}</span>
-            <p className="text-xs font-bold text-slate-200">{job.vramPeakGB || 8.19} GB</p>
+            <p className="text-xs font-bold text-slate-200">
+              {typeof job.vramPeakGB === 'number' ? `${job.vramPeakGB} GB` : '—'}
+            </p>
+            {job.gpuName && <p className="text-[10px] text-slate-500 truncate">{job.gpuName}</p>}
           </div>
 
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-2.5 space-y-0.5">
             <span className="text-[10px] text-slate-400">{t.fpsUsed}</span>
-            <p className="text-xs font-bold text-slate-200">{job.fps} FPS</p>
+            <p className="text-xs font-bold text-slate-200">
+              {job.playbackFps ?? job.fps} FPS
+            </p>
+            {typeof job.frameCount === 'number' && (
+              <p className="text-[10px] text-slate-500">{job.frameCount} frames</p>
+            )}
           </div>
 
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-2.5 space-y-0.5">

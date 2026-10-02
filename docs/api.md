@@ -73,7 +73,10 @@
   "duration": 5,
   "resolution": "720p",
   "generationTimeSec": 24.8,
-  "vramUsageGB": 8.19
+  "vramPeakGB": 6.0,
+  "gpuName": "Tesla T4",
+  "frameCount": 81,
+  "playbackFps": 16
 }
 ```
 

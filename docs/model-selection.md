@@ -23,7 +23,7 @@
 | **الترخيص (License)** | Apache 2.0 (Commercial & Research) | Apache 2.0 | Apache 2.0 | Apache 2.0 | Apache 2.0 |
 | **المعمارية (Architecture)** | 3D DiT + Wan-VAE + T5 Text Enc | DiT + VAE | Dual DiT (3D) + MLLM Enc | 3D Causal VAE + Expert DiT | Asymmetric DiT |
 | **الأحجام المتاحة** | **1.3B** (خفيف وسريع) و **14B** (سينمائي) | 2B | 13B | 2B / 5B / 1.5-5B | 10B |
-| **أدنى VRAM للتشغيل** | **~8.19 GB** (1.3B مع CPU Offload) | **~12 GB** | ~32 GB (أو 24GB مع FP8) | ~14-18 GB | ~36 GB (FP8 ~20GB) |
+| **VRAM نموذجي** (ليس قياساً مضموناً) | **~6–8 GB** (1.3B مع CPU Offload) | **~12 GB** | ~32 GB (أو 24GB مع FP8) | ~14-18 GB | ~36 GB (FP8 ~20GB) |
 | **أقصى دقة (Resolution)** | 480P / 720P / 1080P | 768x512 / 704x480 | 720P / 1080P | 720P (CogVideoX 1.5) | 848x480 |
 | **معدل الإطارات (FPS)** | 16 / 24 FPS | 24 / 30 FPS | 24 FPS | 8 / 16 / 24 FPS | 30 FPS |
 | **دعم HuggingFace Diffusers** | **نعم (مدمج رسمياً)** | **نعم (مدمج رسمياً)** | نعم (عبر Diffusers PR/Scripts) | نعم (مدمج رسمياً) | جزئي / 커스텀 |
@@ -43,7 +43,7 @@
 1. **Wan2.1 (T2V-1.3B / 14B)**:
    - **ثبات الحركة وجودة الكاميرا**: حركة طيران جوية (Aerial drone) شديدة السلاسة، لا يوجد تقطيع أو تشوه في الأشجار والتضاريس الجبلية.
    - **الالتزام بالنص (Prompt Adherence)**: أظهر أشجار البن وتدرجات ضوء الشروق الذهبي وجبال اليمن بدقة فائقة.
-   - **الأداء الحسابي**: الإصدار 1.3B يستهلك 8.19 GB VRAM فقط ويعمل بسلاسة على Google Colab (Free T4 GPU)، بينما 14B يوفر جودة تنافس Sora و Gen-3 على A100.
+   - **الأداء الحسابي**: الإصدار 1.3B يعمل بسلاسة على Google Colab (Free T4 GPU)، بينما 14B يوفر جودة تنافس Sora و Gen-3 على A100.
    - **التقييم العام**: 9.6 / 10.
 
 2. **LTX-Video (0.9.5)**:
