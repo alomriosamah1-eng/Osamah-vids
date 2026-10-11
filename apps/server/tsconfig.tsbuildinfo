@@ -1,0 +1,1 @@
+{"root":["./src/config.ts","./src/env.ts","./src/index.ts","./src/pipeline.ts","./src/validation.ts","./src/adapters/opencode.ts","./src/events/sse.ts","./src/http/server.ts","./src/projects/repo.ts"],"version":"5.9.3"}

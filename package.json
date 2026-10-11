@@ -1,0 +1,29 @@
+{
+  "name": "osamah-vids-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Osamah vids ai — desktop AI video production studio (opencode agent + Playwright capture + ffmpeg)",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "tools:vendor": "node tools/bootstrap.mjs",
+    "dev": "concurrently -k -n server,web,electron -c blue,magenta,green \"npm:dev:server\" \"npm:dev:web\" \"npm:dev:electron\"",
+    "dev:server": "npm run dev --workspace @osamah/server",
+    "dev:web": "npm run dev --workspace @osamah/web",
+    "dev:electron": "wait-on tcp:5173 tcp:8799 && npm run start --workspace @osamah/desktop",
+    "build": "npm run build --workspace @osamah/core && npm run build --workspace @osamah/render-engine && npm run build --workspace @osamah/web && npm run build --workspace @osamah/server",
+    "typecheck": "npm run build --workspace @osamah/core && npm run typecheck --workspaces --if-present",
+    "lint:docs": "node tools/check-docs.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3",
+    "wait-on": "^8.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

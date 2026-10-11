@@ -1,0 +1,34 @@
+node_modules/
+dist/
+build/
+out/
+*.log
+.DS_Store
+
+# tooling (vendored locally, not committed)
+tools/cache/
+tools/ffmpeg/
+tools/python/
+!tools/bin/
+!tools/bootstrap.mjs
+!tools/README.md
+
+# generated project outputs
+projects/*/out/
+projects/*/narration/
+projects/*/scenes/
+projects/*/events.ndjson
+
+# runtime project library (videos, scripts, briefs, trash) — generated locally
+projects/*
+!projects/.gitkeep
+
+# os / editor noise
+*.swp
+
+# env
+.env
+.env.local
+
+# user settings (chosen model)
+settings.json

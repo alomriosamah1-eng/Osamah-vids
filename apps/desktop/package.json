@@ -1,0 +1,15 @@
+{
+  "name": "@osamah/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build": "echo 'electron packaging later (electron-builder)'"
+  },
+  "dependencies": {
+    "electron": "^33.0.2"
+  },
+  "devDependencies": {}
+}

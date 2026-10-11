@@ -1,0 +1,112 @@
+{
+  "$schema": "./docs/schemas/osamah-vids-ai.config.schema.json",
+  "app": {
+    "name": "Osamah vids ai",
+    "locale": "ar",
+    "direction": "rtl",
+    "themeDefault": "dark"
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8799
+  },
+  "web": {
+    "devPort": 5173
+  },
+  "models": {
+    "understand": "opencode/big-pickle",
+    "script": "opencode/big-pickle",
+    "scenes": "opencode/big-pickle",
+    "edit": "opencode/big-pickle",
+    "qc": "opencode/big-pickle"
+  },
+  "opencode": {
+    "bin": "./tools/bin/opencode",
+    "agent": "video-agent",
+    "autoApprove": true,
+    "timeoutMs": 300000,
+    "maxStdoutBytes": 8388608
+  },
+  "voices": {
+    "female": {
+      "id": "ar-SA-ZariyahNeural",
+      "label": "أنثى"
+    },
+    "male": {
+      "id": "ar-SA-HamedNeural",
+      "label": "ذكر"
+    },
+    "rate": "+12%"
+  },
+  "render": {
+    "fps": 30,
+    "trailMs": 900,
+    "crf": 18,
+    "preset": "medium",
+    "browsersPath": "./tools/cache/ms-playwright"
+  },
+  "quality": {
+    "720p": {
+      "width": 1280,
+      "height": 720,
+      "label": "720p"
+    },
+    "1080p": {
+      "width": 1920,
+      "height": 1080,
+      "label": "1080p (افتراضي)"
+    },
+    "1440p": {
+      "width": 2560,
+      "height": 1440,
+      "label": "2K"
+    }
+  },
+  "orientation": {
+    "horizontal": {
+      "width": 1920,
+      "height": 1080,
+      "label": "أفقي"
+    },
+    "vertical": {
+      "width": 1080,
+      "height": 1920,
+      "label": "عمودي"
+    }
+  },
+  "styles": [
+    {
+      "id": "documentary",
+      "label": "وثائقي"
+    },
+    {
+      "id": "educational",
+      "label": "تعليمي"
+    },
+    {
+      "id": "historical",
+      "label": "تاريخي"
+    },
+    {
+      "id": "news",
+      "label": "إعلامي"
+    },
+    {
+      "id": "scientific",
+      "label": "علمي"
+    },
+    {
+      "id": "motivational",
+      "label": "تحفيزي"
+    },
+    {
+      "id": "explainer",
+      "label": "شروحات"
+    }
+  ],
+  "duration": {
+    "minSeconds": 10,
+    "maxSeconds": 3600,
+    "stepSeconds": 10
+  }
+}

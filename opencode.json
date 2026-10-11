@@ -1,0 +1,72 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "description": "الافتراضي: توليد JSON دون أدوات (يُستخدم لأنبوب الفيديو)",
+      "tools": {
+        "bash": false,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "read": false,
+        "grep": false,
+        "glob": false,
+        "list": false,
+        "webfetch": false,
+        "websearch": false,
+        "task": false,
+        "todowrite": false
+      },
+      "permission": {
+        "bash": "deny",
+        "edit": "deny",
+        "read": "deny",
+        "grep": "deny",
+        "glob": "deny",
+        "list": "deny",
+        "webfetch": "deny",
+        "websearch": "deny",
+        "task": "deny"
+      }
+    },
+    "video-agent": {
+      "description": "وكيل إنتاج الفيديو: يفهم البرومبت، يكتب السكربت، ويولّد مشاهد JSON مطابقة لعقد المشهد، ويجيب على طلبات التعديل.",
+      "mode": "primary",
+      "model": "opencode/big-pickle",
+      "temperature": 0.4,
+      "prompt": "أنت مهندس إنتاج فيديو في تطبيق Osamah vids ai. مهمتك تحويل طلب المستخدم إلى مخرجات منظّمة. عقد المشهد مُضمَّن داخل الطلب نفسه؛ لا تقرأ ملفات ولا تستخدم أي أدوات. أخرِج JSON صالحاً فقط عند الطلب، دون أي نص إضافي. التزم بالعربية في كل النصوص الظاهرة.",
+      "tools": {
+        "bash": false,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "read": false,
+        "grep": false,
+        "glob": false,
+        "list": false,
+        "webfetch": false,
+        "websearch": false,
+        "task": false,
+        "todowrite": false
+      },
+      "permission": {
+        "bash": "deny",
+        "edit": "deny",
+        "read": "deny",
+        "grep": "deny",
+        "glob": "deny",
+        "list": "deny",
+        "webfetch": "deny",
+        "websearch": "deny",
+        "task": "deny"
+      }
+    },
+    "video-qc": {
+      "description": "وكيل ضبط الجودة: يفحص ملخّص نتائج ffprobe ويقترح إصلاحات.",
+      "mode": "subagent",
+      "model": "opencode/big-pickle",
+      "tools": { "bash": false, "edit": false, "write": false, "read": false, "grep": false, "glob": false },
+      "permission": { "bash": "deny", "edit": "deny", "read": "deny" }
+    }
+  }
+}
