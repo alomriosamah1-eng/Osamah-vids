@@ -3,6 +3,13 @@
 > سجلّ آلي يكتبه الوكيل بعد كل تغيير. الصيغة:
 > `- YYYY-MM-DD HH:MM | phase | files | what | verified`
 
+## 2026-10-11 — اختصار سطح المكتب + أيقونة، وتنظيف ورفع المستودع
+- 2026-10-11 05:45 | release | apps/desktop/icon.svg، apps/desktop/assets/icon-{48,64,128,256,512}.png | **أيقونة التطبيق** بهوية الشعار (مربّع متدرّج cyan→violet→amber مع شكل V) مُولَّدة SVG ثم PNG بأحجام متعددة | ✅ تحقّق بصري
+- 2026-10-11 05:45 | release | run-app.sh | **مشغّل موحّد** يبدأ الخادم + الواجهة + Electron (idempotent، مسار `ROOT` مشتق من موقع السكربت ليكون محمولًا) | ✅ `bash -n`
+- 2026-10-11 05:45 | release | ~/.local/share/applications/osamah-vids-ai.desktop، ~/Desktop/osamah-vids-ai.desktop | اختصار سطح مكتب باسم **Osamah vids ai** (Icon=osamah-vids-ai مثبّتة في hicolor 48→512، trusted، Exec=run-app.sh) | ✅ desktop-file-validate
+- 2026-10-11 05:45 | release | .gitignore، projects/.gitkeep | تنظيف المستودع: تجاهل مكتبة المشاريع وقت التشغيل `projects/*` (مع الإبقاء على `.gitkeep`)، و`*.swp`؛ لا node_modules/dist/caches | ✅ 106 ملفًا، ~908K فقط
+- 2026-10-11 05:45 | release | (git) | تهيئة مستودع نظيف (فرع main، commit واحد شامل) والرفع إلى `git@github.com:alomriosamah1-eng/Osamah-vids.git` مع استبدال main القديم (force) | ✅ `bacd144...b9909fd main -> main (forced update)`
+
 ## 2026-10-11 — إصلاح مشغّل الفيديو (دعم HTTP Range) + تشغيل التطبيق
 - 2026-10-11 04:15 | p7 | apps/server/src/http/server.ts | **إصلاح**: مسار `GET /api/projects/:id/file/*` كان يتجاهل ترويسة `Range` ويعيد `200` بالملف كاملًا → منع `<video>` من التشغيل/التنقّل. الآن يعيد `206 Partial Content` مع `Content-Range`/`Content-Length` الصحيحين، ويدعم النطاقات اللاحقة `bytes=-N`، و`416 Range Not Satisfiable` للنطاقات غير الصالحة، و`HEAD`، و`Cache-Control: no-store` | ✅ متحقَّق
 - 2026-10-11 04:15 | p7 | apps/web (لا تغيير) | `VideoPlayer` يطلب `/api/projects/:id/file/out/final.mp4` (يمر عبر بروكسي Vite) — المشكلة كانت في الخادم لا الواجهة | ✅
